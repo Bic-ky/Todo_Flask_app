@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <link href="{{ url_for('static', filename='index.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-5">Todo List</h1>
+
+        <!-- Form to add new todo item -->
+        <form action="{{ url_for('main.add') }}" method="POST" class="form-inline justify-content-center mb-4">
+            <input type="text" name="todoitem" class="form-control mr-2" placeholder="Enter new todo" required>
+            <button type="submit" class="btn btn-primary">Add</button>
+        </form>
+
+        <!-- Incomplete tasks -->
+        <h3>Incomplete</h3>
+        <div class="mb-4">
+            {% for item in incomplete %}
+            <div class="todo-item">
+                <span class="{% if item.complete %}completed{% endif %}">{{ item.text }}</span>
+                <div>
+                    <!-- Complete action -->
+                    <a href="{{ url_for('main.complete', id=item.id) }}" class="btn btn-sm btn-success">Complete</a>
+                    
+                    <!-- Edit action -->
+                    <button type="button" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#editModal{{ item.id }}">Edit</button>
+                    
+                    <!-- Delete action -->
+                    <a href="{{ url_for('main.delete', id=item.id) }}" class="btn btn-sm btn-danger">Delete</a>
+                </div>
+            </div>
+
+            <!-- Edit Modal -->
+            <div class="modal fade" id="editModal{{ item.id }}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel{{ item.id }}" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editModalLabel{{ item.id }}">Edit Todo</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form action="{{ url_for('main.edit', id=item.id) }}" method="POST">
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="todoitem">Todo Item</label>
+                                    <input type="text" class="form-control" name="todoitem" value="{{ item.text }}" required>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {% endfor %}
+            {% if not incomplete %}
+            <p>No incomplete tasks!</p>
+            {% endif %}
+        </div>
+
+        <!-- Complete tasks -->
+        <h3>Complete</h3>
+        <div>
+            {% for item in complete %}
+            <div class="todo-item completed">
+                <span>{{ item.text }}</span>
+                <a href="{{ url_for('main.delete', id=item.id) }}" class="btn btn-sm btn-danger">Delete</a>
+            </div>
+            {% endfor %}
+            {% if not complete %}
+            <p>No completed tasks!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
